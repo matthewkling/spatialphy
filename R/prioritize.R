@@ -24,7 +24,7 @@ benefit <- function(x, lambda = 1){
 #'
 #' @return A ranking of conservation priorities, with low values representing higher priorities.
 #' @export
-prioritize <- function(sp,
+sphy_prioritize <- function(sp,
                        protection = NULL,
                        lambda = 1,
                        level = 1){

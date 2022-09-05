@@ -6,7 +6,7 @@
 #'
 #' @return A matrix or raster stack with a column or layer (respectively) for each diversity metric.
 #' @export
-diversity <- function(sp, spatial = T){
+sphy_div <- function(sp, spatial = T){
 
       ## taxon variables ##
 

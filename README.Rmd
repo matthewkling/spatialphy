@@ -41,7 +41,7 @@ devtools::install_github("matthewkling/spatialphy")
 
 Spatial phylogenetic analyses require two essential ingredients: data on the geographic distributions of a set of organisms, and a phylogeny representing their evolutionary relationships. All workflows in the spatialphy package will involve creating a dataset of class `'spatialphy'` containing these necessary components. 
 
-A user would normally define this object with their own data using the `sphy()` function, but we can also simulate a demonstraiton dataset using `simulate_sphy()`, which we'll do here. The dataset is a list containing:
+A user would normally define this object with their own data using the `sphy()` function, but we can also simulate a demonstraiton dataset using `sphy_simulate()`, which we'll do here. The dataset is a list containing:
 
 - a phylogeny
 - a matrix of occrrence data for evey clade at every level of the tree (this is constructed internally from user-supplied data about the occurrences of the terminal taxa)
@@ -51,16 +51,16 @@ A user would normally define this object with their own data using the `sphy()` 
 library(spatialphy)
 library(tmap); library(magrittr) # for visualization
 set.seed(123)
-sp <- simulate_sphy(n_tips = 50)
+sp <- sphy_simulate(n_tips = 50)
 ```
 
 
 #### Alpha diversity
 
-We can then pass this data object to the other functions in the library. The `diversity()` function calculates a number of alpha diversity measures, including phylogenetic diversity (PD), phylogenetic endemism (PE), and several others. 
+We can then pass this data object to the other functions in the library. The `sphy_div()` function calculates a number of alpha diversity measures, including phylogenetic diversity (PD), phylogenetic endemism (PE), and several others. 
 
 ```{r alpha, message=FALSE, warning=FALSE}
-div <- diversity(sp)
+div <- sphy_div(sp)
 names(div)
 tm_shape(div$PD) + tm_raster()
 ```
@@ -71,14 +71,14 @@ tm_shape(div$PD) + tm_raster()
 We can also look at patterns in the phylogenetic similarity among locations. The first step here is to compute the community phylogenetic distance between every pair of sites; we'll use the `phylo_dist()` function to add a pariwise distance matrix as an additional component in our spatialphy dataset.
 
 ```{r beta, message=FALSE, warning=FALSE}
-sp <- phylo_dist(sp, add = T)
+sp <- sphy_dist(sp, add = T)
 ```
 
 Having done this, we can then assess spatial turnover patterns in a couple ways. We can qualitatively visualize them by converting the distance matrix to a set of colors representing how similar two sites are to each other, using the `phylo_rgb()` function:
 
 ```{r rgb, message=FALSE, warning=FALSE}
 sp %>%
-      phylo_rgb() %>%
+      sphy_rgb() %>%
       tm_shape() +
       tm_rgb(max.value = 1) +
       tm_layout(title = "Phylogenetic ordination")
@@ -88,7 +88,7 @@ We can also perform a more formal cluster analysis that splits the landscape int
 
 ```{r regions, message=FALSE, warning=FALSE}
 sp %>%
-      phylo_regions(k = 8) %>%
+      sphy_regions(k = 8) %>%
       tm_shape() +
       tm_raster(palette = "cat") +
       tm_layout(legend.outside = T,
@@ -104,7 +104,7 @@ In addition to our spatial phylogenetic dataset, we could optionally supply a ra
 
 ```{r priorities, message=FALSE, warning=FALSE}
 sp %>%
-      prioritize() %>%
+      sphy_prioritize() %>%
       tm_shape() + 
       tm_raster(palette = c("yellow", "red", "blue", "black"),
                 colorNA = "gray80", n = 20,

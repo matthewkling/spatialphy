@@ -39,7 +39,7 @@ spatialphy package will involve creating a dataset of class
 
 A user would normally define this object with their own data using the
 `sphy()` function, but we can also simulate a demonstraiton dataset
-using `simulate_sphy()`, which we’ll do here. The dataset is a list
+using `sphy_simulate()`, which we’ll do here. The dataset is a list
 containing:
 
 -   a phylogeny
@@ -52,18 +52,18 @@ containing:
 library(spatialphy)
 library(tmap); library(magrittr) # for visualization
 set.seed(123)
-sp <- simulate_sphy(n_tips = 50)
+sp <- sphy_simulate(n_tips = 50)
 ```
 
 #### Alpha diversity
 
 We can then pass this data object to the other functions in the library.
-The `diversity()` function calculates a number of alpha diversity
+The `sphy_div()` function calculates a number of alpha diversity
 measures, including phylogenetic diversity (PD), phylogenetic endemism
 (PE), and several others.
 
 ``` r
-div <- diversity(sp)
+div <- sphy_div(sp)
 names(div)
 #> [1] "CR"  "PD"  "E"   "PE"  "Em"  "PDm" "PEm" "BEm"
 tm_shape(div$PD) + tm_raster()
@@ -80,7 +80,7 @@ function to add a pariwise distance matrix as an additional component in
 our spatialphy dataset.
 
 ``` r
-sp <- phylo_dist(sp, add = T)
+sp <- sphy_dist(sp, add = T)
 ```
 
 Having done this, we can then assess spatial turnover patterns in a
@@ -90,7 +90,7 @@ are to each other, using the `phylo_rgb()` function:
 
 ``` r
 sp %>%
-      phylo_rgb() %>%
+      sphy_rgb() %>%
       tm_shape() +
       tm_rgb(max.value = 1) +
       tm_layout(title = "Phylogenetic ordination")
@@ -104,7 +104,7 @@ landscape into a set of evolutionary bioregions, using the
 
 ``` r
 sp %>%
-      phylo_regions(k = 8) %>%
+      sphy_regions(k = 8) %>%
       tm_shape() +
       tm_raster(palette = "cat") +
       tm_layout(legend.outside = T,
@@ -134,7 +134,7 @@ are in yellow.
 
 ``` r
 sp %>%
-      prioritize() %>%
+      sphy_prioritize() %>%
       tm_shape() + 
       tm_raster(palette = c("yellow", "red", "blue", "black"),
                 colorNA = "gray80", n = 20,

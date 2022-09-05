@@ -62,7 +62,7 @@ to_raster <- function(m, template){
 #'
 #' @return A list containing a phylogenetic tree and a raster stack of terminal taxon ranges.
 #' @export
-simulate_sphy <- function(n_tips = 10,
+sphy_simulate <- function(n_tips = 10,
                           n_x = 20,
                           n_y = 20,
                           boolean_ranges = F

@@ -39,7 +39,7 @@ beta_diversity <- function(M, branch_lengths){
 #'
 #' @return A pairwise phylogenetic difference matrix, with values of 1/PhyloSor, either on its own or as an element of \code{sp}.
 #' @export
-phylo_dist <- function(sp, add = T){
+sphy_dist <- function(sp, add = T){
 
       if(!is.null(sp$dist)){
             message("distance already included in dataset; skipping calculation")
@@ -67,9 +67,9 @@ phylo_dist <- function(sp, add = T){
 #'
 #' @return A raster or matrix with an integer indicating which of the \code{k} regions each site belongs to.
 #' @export
-phylo_regions <- function(sp, k = 5, method = "hclust"){
+sphy_regions <- function(sp, k = 5, method = "hclust"){
 
-      if(is.null(sp$dist)) sp <- phylo_dist(sp, add = T)
+      if(is.null(sp$dist)) sp <- sphy_dist(sp, add = T)
 
       d <- as.matrix(sp$dist)
       rownames(d) <- colnames(d) <- paste("cell", 1:ncol(d))
@@ -112,7 +112,7 @@ phylo_regions <- function(sp, k = 5, method = "hclust"){
 #'
 #' @return A raster or matrix with layers or columns (respectively) containing RGB color values.
 #' @export
-phylo_rgb <- function(sp, ord_method = "nmds"){
+sphy_rgb <- function(sp, ord_method = "nmds"){
 
       d <- as.matrix(sp$dist)
       rownames(d) <- colnames(d) <- paste("cell", 1:ncol(d))
