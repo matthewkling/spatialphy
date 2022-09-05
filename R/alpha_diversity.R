@@ -4,9 +4,21 @@
 #' @param sp spatialphy object (created by \code{sphy()} or \code{simulate_sphy()}).
 #' @param spatial Boolean: should the function return a spatial object (TRUE, default) or a vector (FALSE).
 #'
+#' @details The function calculates the following metrics:
+#' * TR: Terminal richness, i.e. richness of terminal taxa (in many cases these are species)
+#' * CR: Clade richness, i.e. richness of taxa at all levels
+#' * PD: Phylogenetic diversity
+#' * TE: Terminal endemism, i.e. total endemic diversity of terminal taxa, aka WE
+#' * CE: Clade endemism, i.e. total endemic diversity of taxa at all levels
+#' * PE: Phylogenetic endemism
+#' * Em: Mean endemism (derivation is equivalent to E / CR)
+#' * PDm: Mean phylogenetic diversity, i.e. branch length of mean resident (derivation is equivalent to PD / CR)
+#' * PEm: Mean phylogenetic endemism, i.e. branch length / range size of mean resident (derivation is equivalent to PE / CR
+#' * BEm: Mean branch length of the endemics
+#'
 #' @return A matrix or raster stack with a column or layer (respectively) for each diversity metric.
 #' @export
-sphy_div <- function(sp, spatial = T){
+sphy_diversity <- function(sp, spatial = T){
 
       ## taxon variables ##
 
@@ -15,21 +27,16 @@ sphy_div <- function(sp, spatial = T){
 
       R <- apply(sp$occ, 2, sum, na.rm=T) # range sizes
 
+      tips <- which(sp$tree$edge[,2] %in% setdiff(sp$tree$edge[,2], sp$tree$edge[,1]))
+
 
       ## site variables ##
 
-      # CR: Clade richness, i.e. richness of taxa at all levels
-      # PD: Phylogenetic diversity
-      # E: Endemism, i.e. total endemic diversity, aka WE
-      # PE: Phylogenetic endemism
-      # Em: Mean endemism (derivation is equivalent to E / CR)
-      # PDm: Mean phylogenetic diversity, i.e. branch length of mean resident (derivation is equivalent to PD / CR)
-      # PEm: Mean phylogenetic endemism, i.e. branch length / range size of mean resident (derivation is equivalent to PE / CR
-      # BEm: Mean branch length of the endemics
-
-      div <- cbind(CR =  apply(sp$occ, 1, sum, na.rm=T),
+      div <- cbind(TR =  apply(sp$occ[tips,], 1, sum, na.rm=T),
+                   CR =  apply(sp$occ, 1, sum, na.rm=T),
                    PD =  apply(sp$occ, 1, function(p) sum(p * V, na.rm = T)),
-                   E =   apply(sp$occ, 1, function(p) sum(p / R, na.rm = T)),
+                   TE =  apply(sp$occ[tips,], 1, function(p) sum(p / R[tips], na.rm = T)),
+                   CE =  apply(sp$occ, 1, function(p) sum(p / R, na.rm = T)),
                    PE =  apply(sp$occ, 1, function(p) sum(p * V / R, na.rm = T)),
                    Em =  apply(sp$occ, 1, function(p) weighted.mean(1 / R, w = p, na.rm = T)),
                    PDm = apply(sp$occ, 1, function(p) weighted.mean(V, w = p, na.rm = T)),

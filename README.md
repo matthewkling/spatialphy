@@ -58,14 +58,14 @@ sp <- sphy_simulate(n_tips = 50)
 #### Alpha diversity
 
 We can then pass this data object to the other functions in the library.
-The `sphy_div()` function calculates a number of alpha diversity
+The `sphy_diversity()` function calculates a number of alpha diversity
 measures, including phylogenetic diversity (PD), phylogenetic endemism
 (PE), and several others.
 
 ``` r
-div <- sphy_div(sp)
+div <- sphy_diversity(sp)
 names(div)
-#> [1] "CR"  "PD"  "E"   "PE"  "Em"  "PDm" "PEm" "BEm"
+#>  [1] "TR"  "CR"  "PD"  "TE"  "CE"  "PE"  "Em"  "PDm" "PEm" "BEm"
 tm_shape(div$PD) + tm_raster()
 ```
 
