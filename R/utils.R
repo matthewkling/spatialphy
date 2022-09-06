@@ -5,6 +5,9 @@
 NULL
 
 
+enforce_spatialphy <- function(x){
+      if(!inherits(x, "spatialphy")) stop("Dataset must be an object of class 'spatialphy' created by the 'sphy()' or 'sphy_simulate()' function.")
+}
 
 tip_indices <- function(tree) which(tree$edge[,2] %in% setdiff(tree$edge[,2], tree$edge[,1]))
 

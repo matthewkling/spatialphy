@@ -42,15 +42,15 @@ remotes::install_github("matthewkling/spatialphy")
 
 Spatial phylogenetic analyses require two essential ingredients: data on the geographic distributions of a set of organisms, and a phylogeny representing their evolutionary relationships. All workflows in the spatialphy package will involve creating a dataset of class `'spatialphy'` containing these necessary components. 
 
-A user would normally define this object with their own data using the `sphy()` function, but we can also simulate a demonstraiton dataset using `sphy_simulate()`, which we'll do here. The dataset is a list containing:
+A user would normally define this object with their own data using the `sphy()` function, but we can also simulate a demonstration dataset using `sphy_simulate()`, which we'll do here. The dataset is a list containing:
 
 - a phylogeny
-- a matrix of occrrence data for evey clade at every level of the tree (this is constructed internally from user-supplied data about the occurrences of the terminal taxa)
+- a matrix of occurrence data for every clade at every level of the tree (this is constructed internally from user-supplied data about the occurrences of the terminal taxa). Note that this can be presence-absence data, or it can be a fractional value indicating occurrence probability, as is often produced by species distribution models.
 - some spatial metadata, in the form of a raster layer
 
 ```{r init, message=FALSE, warning=FALSE}
 library(spatialphy)
-library(tmap); library(magrittr) # for visualization
+library(tmap); library(magrittr)
 set.seed(123)
 sp <- sphy_simulate(n_tips = 50)
 ```
@@ -69,13 +69,13 @@ tm_shape(div$PD) + tm_raster()
 
 #### Beta diversity (turnover)
 
-We can also look at patterns in the phylogenetic similarity among locations. The first step here is to compute the community phylogenetic distance between every pair of sites; we'll use the `phylo_dist()` function to add a pariwise distance matrix as an additional component in our spatialphy dataset.
+We can also look at patterns in the phylogenetic similarity among locations. The first step here is to compute the community phylogenetic distance between every pair of sites; we'll use the `sphy_dist()` function to add a pariwise distance matrix as an additional component in our spatialphy dataset.
 
 ```{r beta, message=FALSE, warning=FALSE}
 sp <- sphy_dist(sp, add = T)
 ```
 
-Having done this, we can then assess spatial turnover patterns in a couple ways. We can qualitatively visualize them by converting the distance matrix to a set of colors representing how similar two sites are to each other, using the `phylo_rgb()` function:
+Having done this, we can then assess spatial turnover patterns in a couple ways. We can qualitatively visualize them by converting the distance matrix to a set of colors representing how similar two sites are to each other, using the `sphy_rgb()` function:
 
 ```{r rgb, message=FALSE, warning=FALSE}
 sp %>%
@@ -85,7 +85,7 @@ sp %>%
       tm_layout(title = "Phylogenetic ordination")
 ```
 
-We can also perform a more formal cluster analysis that splits the landscape into a set of evolutionary bioregions, using the `phylo_regions()` function. We'll ask for eight regions:
+We can also perform a more formal cluster analysis that splits the landscape into a set of evolutionary bioregions, using the `sphy_regions()` function. We'll ask for eight regions:
 
 ```{r regions, message=FALSE, warning=FALSE}
 sp %>%
@@ -99,9 +99,9 @@ sp %>%
 
 #### Conservation prioritization
 
-Finally, this package can also perform a basic spatial conservation prioritization, identifying priority locations for the creation of new protected areas in order to maximize biodiversity protection. This is done using the `prioritize()` function, which uses a greedy forward stepwise algorithm to produce a nested ranking of conservation priorities.
+Finally, this package can also perform a basic spatial conservation prioritization, identifying priority locations for the creation of new protected areas in order to maximize biodiversity protection. This is done using the `sphy_prioritize()` function, which uses a greedy forward stepwise algorithm to produce a nested ranking of conservation priorities.
 
-In addition to our spatial phylogenetic dataset, we could optionally supply a raster layer indicating the locations and effectiveness of existing protected areas. We could also modify parameters that specify the effective level of protection provided by new reserves, as well as the shape of the "benefit" function that determines the relative importance of protecting the initial populations of every taxon versus more populations of more phylogenetcally distinct taxa. But here we'll stick with the defaults. In the map below, the highest-priority sites are in yellow.
+In addition to our spatial phylogenetic dataset, there is the option to supply a raster layer indicating the locations and effectiveness of existing protected areas. We could also modify parameters that specify the effective level of protection provided by new reserves, as well as the shape of the "benefit" function that determines the relative importance of protecting the initial populations of every taxon versus more populations of more phylogenetically distinct taxa. But here we'll stick with the defaults. In the map below, the highest-priority sites are in yellow.
 
 ```{r priorities, message=FALSE, warning=FALSE}
 sp %>%
