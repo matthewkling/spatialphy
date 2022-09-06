@@ -4,7 +4,7 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Matthew", "Kling", , "mkling@uvm.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-9073-4240"))
-Description: This package can be used to compute a variety of spatial phylogenetic metrics, using data on a phylogenetic tree and the geographic distributions of the terminal taxa. Functionality includes diversity metrics, turnover and biotic regionalization analyses, and spatial conservation prioritization.
+Description: This package aims to compute a variety of spatial phylogenetic metrics, using data on a phylogenetic tree and the geographic distributions of the terminal taxa. Functionality includes diversity metrics, turnover and biotic regionalization analyses, and spatial conservation prioritization.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
