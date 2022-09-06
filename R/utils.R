@@ -6,6 +6,8 @@ NULL
 
 
 
+tip_indices <- function(tree) which(tree$edge[,2] %in% setdiff(tree$edge[,2], tree$edge[,1]))
+
 parentProb <- function(x) 1 - prod(1 - x)
 
 # for a given tree edge index, calculate occurrence probability for each grid cell

@@ -7,18 +7,20 @@
 <!-- badges: end -->
 
 `spatialphy` is an R package for spatial phylogentic analysis. The field
-of spatial phylogenetics is focused on accounting for evolutionary
-relationships among taxa when describing biodiversity patterns, which
-has a number of advantages over species-based accounting. This library
-currently includes functions for computing:
+of spatial phylogenetics focuses on accounting for evolutionary
+relationships among taxa when describing biodiversity patterns, an
+approach that has a number of advantages over species-based accounting.
+This library currently includes functions for computing:
 
 -   diversity measures like phylogenetic diversity
 -   turnover measures like phylogenetic betaendemism
 -   phylogenetic regionalization
 -   phylogenetic conservation prioritization
 
-The package is still actively under development; there may be bugs, and
-the API is subject to change.
+*WARNING:* This package is still in the early stages of development;
+there may well be bugs, and the API is subject to change. Use of this
+library in real projects is not recommended until a more stable version
+is released.
 
 ## Installation
 
@@ -26,7 +28,8 @@ This package is not yet on CRAN. You can install the development version
 of spatialphy like so:
 
 ``` r
-devtools::install_github("matthewkling/spatialphy")
+# install.packages("remotes")
+remotes::install_github("matthewkling/spatialphy")
 ```
 
 ## Examples

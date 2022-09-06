@@ -27,15 +27,15 @@ sphy_diversity <- function(sp, spatial = T){
 
       R <- apply(sp$occ, 2, sum, na.rm=T) # range sizes
 
-      tips <- which(sp$tree$edge[,2] %in% setdiff(sp$tree$edge[,2], sp$tree$edge[,1]))
+      tips <- tip_indices(sp$tree)
 
 
       ## site variables ##
 
-      div <- cbind(TR =  apply(sp$occ[tips,], 1, sum, na.rm=T),
+      div <- cbind(TR =  apply(sp$occ[, tips], 1, sum, na.rm=T),
                    CR =  apply(sp$occ, 1, sum, na.rm=T),
                    PD =  apply(sp$occ, 1, function(p) sum(p * V, na.rm = T)),
-                   TE =  apply(sp$occ[tips,], 1, function(p) sum(p / R[tips], na.rm = T)),
+                   TE =  apply(sp$occ[, tips], 1, function(p) sum(p / R[tips], na.rm = T)),
                    CE =  apply(sp$occ, 1, function(p) sum(p / R, na.rm = T)),
                    PE =  apply(sp$occ, 1, function(p) sum(p * V / R, na.rm = T)),
                    Em =  apply(sp$occ, 1, function(p) weighted.mean(1 / R, w = p, na.rm = T)),
@@ -46,3 +46,48 @@ sphy_diversity <- function(sp, spatial = T){
       if(spatial & !is.null(sp$spatial)) div <- to_raster(div, sp$spatial)
       return(div)
 }
+
+
+#' Randomization tests including CANAPE
+#'
+#' This function is a wrapper around the \code{cpr_rand_test} function from Joel Nitta's \code{canaper} package.
+#'
+#' @param sp spatialphy object
+#' @param null_model see \code{canaper::cpr_rand_test}
+#' @param spatial Boolean: should the function return a spatial object (TRUE, default) or a vector (FALSE).
+#' @param ... further arguments passed to \code{canaper::cpr_rand_test}
+#'
+#' @details This function runs \code{canaper::cpr_rand_test}; see the help for that function for details.
+#'
+#' It also runs \code{canaper::cpr_classify_endem} on the result, and includes the resulting classification as an additional variable, 'endem_type', in the output. 'endem_type' values 0-4 correspond to not-significant, neo, paleo, mixed, and super endemesim, respectively.
+#'
+#' @return A matrix or raster stack with a column or layer (respectively) for each metric.
+#' @export
+sphy_rand <- function(sp, null_model = "swap", spatial = T, ...){
+
+      cpr <- require("canaper")
+      if(!cpr) stop("The sphy_canape() function requires the canaper library, but couldn't find it; please see https://github.com/joelnitta/canaper for info and installation.")
+
+      phy <- sp$tree
+      comm <- sp$occ[, tip_indices(phy)] # discard internal node occurrences
+      colnames(comm) <- paste0("t", 1:ncol(comm))
+      rownames(comm) <- paste0("s", 1:nrow(comm))
+      cm <- comm[rowSums(comm) > 0, ]
+
+      r <- as.matrix(canaper::cpr_rand_test(cm, phy, null_model = null_model, ...))
+
+      ro <- matrix(NA, nrow(comm), ncol(r))
+      ro[rowSums(comm) > 0, ] <- r
+      rownames(ro) <- rownames(comm)
+      colnames(ro) <- colnames(r)
+
+      ro <- canaper::cpr_classify_endem(as.data.frame(ro))
+      ro$endem_type <- as.integer(factor(ro$endem_type,
+                                         levels = c("not significant", "neo", "paleo", "mixed", "super"))) - 1
+      ro <- as.matrix(ro)
+
+      if(spatial & !is.null(sp$spatial)) ro <- to_raster(ro, sp$spatial)
+      return(ro)
+}
+
+
