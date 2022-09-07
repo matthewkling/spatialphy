@@ -9,7 +9,8 @@ enforce_spatialphy <- function(x){
       if(!inherits(x, "spatialphy")) stop("Dataset must be an object of class 'spatialphy' created by the 'sphy()' or 'sphy_simulate()' function.")
 }
 
-tip_indices <- function(tree) which(tree$edge[,2] %in% setdiff(tree$edge[,2], tree$edge[,1]))
+# this gives the position in the edge list, not the node INDEX per se (the number contained in edge list)
+tip_indices <- function(tree, invert = F) which(tree$edge[,2] %in% setdiff(tree$edge[,2], tree$edge[,1]) != invert)
 
 parentProb <- function(x) 1 - prod(1 - x)
 
@@ -22,7 +23,7 @@ build_clade_range <- function(e, phylo, sxt){
       } else{
             clade <- extract.clade(phylo, node)
             otu <- clade$tip.label
-            prob <-  apply(sxt[,otu], 1, parentProb)
+            prob <- apply(sxt[,otu], 1, parentProb)
       }
       return(prob)
 }
@@ -115,10 +116,11 @@ sphy <- function(tree, occ, spatial = NULL){
       }
 
       if(! ncol(occ) %in% c(length(tree$tip.label), length(tree$edge.length))){
-            stop("occurrence dataset does not match tree: must have exactly one variable per terminal, or per edge")
+            stop("occurrence dataset is incompatible with tree: range data must have exactly one variable per terminal, or per edge")
       }
 
       if(ncol(occ) == length(tree$tip.label)){
+            if(!all(colnames(occ) == tree$tip.label)) stop("taxon name mismatch between occurrence data and tree tip labels")
             occ <- build_tree_ranges(tree, occ)
       }
 

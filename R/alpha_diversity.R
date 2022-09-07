@@ -69,8 +69,8 @@ sphy_rand <- function(sp, null_model = "swap", spatial = T, ...){
       if(!cpr) stop("The sphy_canape() function requires the canaper library, but couldn't find it; please see https://github.com/joelnitta/canaper for info and installation.")
 
       phy <- sp$tree
-      comm <- sp$occ[, tip_indices(phy)] # discard internal node occurrences
-      colnames(comm) <- paste0("t", 1:ncol(comm))
+      comm <- sp$occ[, tip_indices(phy)]
+      colnames(comm) <- phy$tip.label
       rownames(comm) <- paste0("s", 1:nrow(comm))
       cm <- comm[rowSums(comm) > 0, ]
 
