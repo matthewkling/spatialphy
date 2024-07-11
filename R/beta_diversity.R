@@ -95,7 +95,7 @@ sphy_regions <- function(sp, k = 5, method = "hclust"){
       if(!is.null(sp$spatial)){
             r <- sp$spatial
             r[] <- a
-            return(r)
+            return(setNames(r, "phyloregion"))
       }else{
             return(a)
       }
@@ -137,7 +137,8 @@ sphy_rgb <- function(sp, ord_method = "nmds"){
       b[!a,] <- NA
 
       if(!is.null(sp$spatial)){
-            r <- stack(sp$spatial, sp$spatial, sp$spatial)
+            r <- setNames(stack(sp$spatial, sp$spatial, sp$spatial),
+                          c("r", "g", "b"))
             r[] <- b
             return(r)
       }else{

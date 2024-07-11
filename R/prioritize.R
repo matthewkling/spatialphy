@@ -64,5 +64,5 @@ sphy_prioritize <- function(sp,
       # return prioritization
       if(!is.null(sp$spatial)) priorities <- sp$spatial
       priorities[] <- r
-      priorities
+      setNames(priorities, "priority")
 }
