@@ -1,5 +1,5 @@
 
-#' Calculate spatial phyologenetic diversity metrics
+#' Calculate spatial phyologenetic diversity and endemism metrics
 #'
 #' @param sp spatialphy object (created by \code{sphy()} or \code{simulate_sphy()}).
 #' @param spatial Boolean: should the function return a spatial object (TRUE, default) or a vector (FALSE).
@@ -11,7 +11,7 @@
 #' * TE: Terminal endemism, i.e. total endemic diversity of terminal taxa, aka WE
 #' * CE: Clade endemism, i.e. total endemic diversity of taxa at all levels
 #' * PE: Phylogenetic endemism
-#' * Em: Mean endemism (derivation is equivalent to E / CR)
+#' * Em: Mean endemism (derivation is equivalent to CE / CR)
 #' * PDm: Mean phylogenetic diversity, i.e. branch length of mean resident (derivation is equivalent to PD / CR)
 #' * PEm: Mean phylogenetic endemism, i.e. branch length / range size of mean resident (derivation is equivalent to PE / CR
 #' * BEm: Mean branch length of the endemics
@@ -21,17 +21,12 @@
 sphy_diversity <- function(sp, spatial = T){
 
       ## taxon variables ##
-
       V <- sp$tree$edge.length / sum(sp$tree$edge.length)
-      V[V==Inf] <- max(V[V!=Inf])
-
-      R <- apply(sp$occ, 2, sum, na.rm=T) # range sizes
-
+      V[V == Inf] <- max(V[V != Inf])
+      R <- apply(sp$occ, 2, sum, na.rm = T) # range sizes
       tips <- tip_indices(sp$tree)
 
-
       ## site variables ##
-
       div <- cbind(TR =  apply(sp$occ[, tips], 1, sum, na.rm=T),
                    CR =  apply(sp$occ, 1, sum, na.rm=T),
                    PD =  apply(sp$occ, 1, function(p) sum(p * V, na.rm = T)),

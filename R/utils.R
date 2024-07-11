@@ -53,7 +53,11 @@ to_raster <- function(m, template){
       a <- array(m,
                  c(ncol(template), nrow(template), ncol(m)),
                  list(NULL, NULL, colnames(m)))
-      brick(aperm(a, c(2, 1, 3)))
+      brick(apply(aperm(a, c(2, 1, 3)), 3, function(x){
+            y <- template
+            y[] <- x
+            return(y)
+      }))
 }
 
 
