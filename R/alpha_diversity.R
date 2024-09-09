@@ -1,20 +1,20 @@
 
-#' Calculate spatial phyologenetic diversity and endemism metrics
+#' Calculate spatial phylogenetic diversity and endemism metrics
 #'
 #' @param sp spatialphy object (created by \code{sphy()} or \code{simulate_sphy()}).
 #' @param spatial Boolean: should the function return a spatial object (TRUE, default) or a vector (FALSE).
 #'
 #' @details The function calculates the following metrics:
 #' * TR: Terminal richness, i.e. richness of terminal taxa (in many cases these are species)
-#' * CR: Clade richness, i.e. richness of taxa at all levels
+#' * CR: Clade richness, i.e. richness of taxa at all levels (equivalent to PD on a cladogram)
 #' * PD: Phylogenetic diversity
-#' * TE: Terminal endemism, i.e. total endemic diversity of terminal taxa, aka WE
-#' * CE: Clade endemism, i.e. total endemic diversity of taxa at all levels
-#' * PE: Phylogenetic endemism
-#' * Em: Mean endemism (derivation is equivalent to CE / CR)
-#' * PDm: Mean phylogenetic diversity, i.e. branch length of mean resident (derivation is equivalent to PD / CR)
-#' * PEm: Mean phylogenetic endemism, i.e. branch length / range size of mean resident (derivation is equivalent to PE / CR
-#' * BEm: Mean branch length of the endemics
+#' * TE: Terminal endemism, i.e. total endemism-weighted diversity of terminal taxa (a.k.a. "weighted endemism")
+#' * CE: Clade endemism, i.e. total endemism-weighted diversity of taxa at all levels (equivalent to PE on a cladrogram)
+#' * PE: Phylogenetic endemism, i.e. endemism-weighted PD
+#' * Em: Mean endemism (equivalent to CE / CR)
+#' * PDm: Mean phylogenetic diversity, i.e. branch length of mean resident (a.k.a. "RPD"; equivalent to PD / CR)
+#' * PEm: Mean phylogenetic endemism, i.e. branch length / range size of mean resident (equivalent to PE / CR)
+#' * BEm: Mean endemism-weighted branch length (a.k.a. "RPE")
 #'
 #' @return A matrix or raster stack with a column or layer (respectively) for each diversity metric.
 #' @export

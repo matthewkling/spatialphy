@@ -2,7 +2,7 @@
 % Please edit documentation in R/alpha_diversity.R
 \name{sphy_diversity}
 \alias{sphy_diversity}
-\title{Calculate spatial phyologenetic diversity and endemism metrics}
+\title{Calculate spatial phylogenetic diversity and endemism metrics}
 \usage{
 sphy_diversity(sp, spatial = T)
 }
@@ -15,20 +15,20 @@ sphy_diversity(sp, spatial = T)
 A matrix or raster stack with a column or layer (respectively) for each diversity metric.
 }
 \description{
-Calculate spatial phyologenetic diversity and endemism metrics
+Calculate spatial phylogenetic diversity and endemism metrics
 }
 \details{
 The function calculates the following metrics:
 \itemize{
 \item TR: Terminal richness, i.e. richness of terminal taxa (in many cases these are species)
-\item CR: Clade richness, i.e. richness of taxa at all levels
+\item CR: Clade richness, i.e. richness of taxa at all levels (equivalent to PD on a cladogram)
 \item PD: Phylogenetic diversity
-\item TE: Terminal endemism, i.e. total endemic diversity of terminal taxa, aka WE
-\item CE: Clade endemism, i.e. total endemic diversity of taxa at all levels
-\item PE: Phylogenetic endemism
-\item Em: Mean endemism (derivation is equivalent to CE / CR)
-\item PDm: Mean phylogenetic diversity, i.e. branch length of mean resident (derivation is equivalent to PD / CR)
-\item PEm: Mean phylogenetic endemism, i.e. branch length / range size of mean resident (derivation is equivalent to PE / CR
-\item BEm: Mean branch length of the endemics
+\item TE: Terminal endemism, i.e. total endemism-weighted diversity of terminal taxa (a.k.a. "weighted endemism")
+\item CE: Clade endemism, i.e. total endemism-weighted diversity of taxa at all levels (equivalent to PE on a cladrogram)
+\item PE: Phylogenetic endemism, i.e. endemism-weighted PD
+\item Em: Mean endemism (equivalent to CE / CR)
+\item PDm: Mean phylogenetic diversity, i.e. branch length of mean resident (a.k.a. "RPD"; equivalent to PD / CR)
+\item PEm: Mean phylogenetic endemism, i.e. branch length / range size of mean resident (equivalent to PE / CR)
+\item BEm: Mean endemism-weighted branch length (a.k.a. "RPE")
 }
 }
