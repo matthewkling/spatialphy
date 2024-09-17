@@ -37,7 +37,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sphy_regions</span><span class="op">(</span><span class="va">sp</span>, k <span class="op">=</span> <span class="fl">5</span>, method <span class="op">=</span> <span class="st">"kmeans"</span>, normalize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sphy_regions</span><span class="op">(</span><span class="va">sp</span>, k <span class="op">=</span> <span class="fl">5</span>, method <span class="op">=</span> <span class="st">"kmeans"</span>, endemism <span class="op">=</span> <span class="cn">FALSE</span>, normalize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -56,8 +56,13 @@
 <dd><p>Clustering method. Options include "kmeans", and the methods listed under <a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a>.</p></dd>
 
 
+<dt id="arg-endemism">endemism<a class="anchor" aria-label="anchor" href="#arg-endemism"></a></dt>
+<dd><p>Logical indicating whether occurrence values should be divided by column (species) totals.</p></dd>
+
+
 <dt id="arg-normalize">normalize<a class="anchor" aria-label="anchor" href="#arg-normalize"></a></dt>
-<dd><p>Logical indicating whether occurrence values should be divided by community totals.</p></dd>
+<dd><p>Logical indicating whether occurrence values should be divided by row (community) totals.
+If so, this happens after endemism division.</p></dd>
 
 </dl></div>
     <div class="section level2">
