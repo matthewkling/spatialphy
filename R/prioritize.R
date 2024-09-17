@@ -40,7 +40,7 @@ sphy_prioritize <- function(sp,
       r <- rep(NA, length(p)) # prioritization rankings
       m <- apply(sp$occ, 2, function(x) x / sum(x)) # normalize to fraction of range
 
-      pb <- txtProgressBar(min = 0, max = length(p), initial = 0, style = 3)
+      pb <- txtProgressBar(min = 0, max = sum(rowSums(m) > 0), initial = 0, style = 3)
       for(i in 1:length(p)){
             setTxtProgressBar(pb, i)
 
