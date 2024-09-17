@@ -40,7 +40,9 @@ sphy_prioritize <- function(sp,
       r <- rep(NA, length(p)) # prioritization rankings
       m <- apply(sp$occ, 2, function(x) x / sum(x)) # normalize to fraction of range
 
+      pb <- txtProgressBar(min = 0, max = length(p), initial = 0, style = 3)
       for(i in 1:length(p)){
+            setTxtProgressBar(pb, i)
 
             # value of current reserve network iteration
             b <- apply(m, 2, function(x) sum(x * p)) # range protection
@@ -60,6 +62,7 @@ sphy_prioritize <- function(sp,
             p[o] <- level # protect site
             r[o] <- i # record ranking
       }
+      close(pb)
 
       # return prioritization
       if(!is.null(sp$spatial)) priorities <- sp$spatial
