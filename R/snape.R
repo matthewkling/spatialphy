@@ -33,10 +33,10 @@ snape <- function(rand,
             colors
       }
 
-      snp <- data.frame(qPE = rand[,"PE"],
-                        qCE = rand[,"CE"],
-                        qPCE = pmax(rand[,"PE"], rand[,"CE"]),
-                        qRPE = rand[,"RPE"])
+      snp <- data.frame(qPE = rand[,"qPE"],
+                        qCE = rand[,"qCE"],
+                        qPCE = pmax(rand[,"qPE"], rand[,"qCE"]),
+                        qRPE = rand[,"qRPE"])
       snp$color <- snape_colors(snp$qPCE, snp$qRPE)
 
       lgd <- expand.grid(qPCE = seq(0, 1, .01),

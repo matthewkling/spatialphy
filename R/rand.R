@@ -110,10 +110,9 @@ sphy_rand <- function(sp, n_rand = 100, spatial = T, n_cores = 1, ...){
                               .options = furrr_options(seed = TRUE))
             for(i in 1:n_rand) rand[,,i+1] <- rnd[[i]]
       }
-      # browser()
 
       q <- apply(rand, 1:2, function(x) mean(x[1] > x[2:(n_rand+1)], na.rm = T) )
-      colnames(q) <- colnames(div)
+      colnames(q) <- paste0("q", colnames(div))
 
       if(spatial & !is.null(sp$spatial)) q <- to_raster(q, sp$spatial)
       return(q)
