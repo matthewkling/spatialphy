@@ -40,7 +40,12 @@ build_tree_ranges <- function(tree, tip_occs){
 }
 
 
-
+get_tip_occs <- function(sp){
+      phy <- sp$tree
+      comm <- sp$occ[, tip_indices(phy)]
+      colnames(comm) <- phy$tip.label
+      comm
+}
 
 #' Convert a site-by-variable matrix into a raster brick
 #'

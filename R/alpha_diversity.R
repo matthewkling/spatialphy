@@ -12,9 +12,9 @@
 #' * CE: Clade endemism, i.e. total endemism-weighted diversity of taxa at all levels (equivalent to PE on a cladrogram)
 #' * PE: Phylogenetic endemism, i.e. endemism-weighted PD
 #' * Em: Mean endemism (equivalent to CE / CR)
-#' * PDm: Mean phylogenetic diversity, i.e. branch length of mean resident (a.k.a. "RPD"; equivalent to PD / CR)
+#' * RPD: Relative phylogenetic diversity, i.e. branch length of mean resident (equivalent to PD / CR)
 #' * PEm: Mean phylogenetic endemism, i.e. branch length / range size of mean resident (equivalent to PE / CR)
-#' * BEm: Mean endemism-weighted branch length (a.k.a. "RPE")
+#' * RPE: Relative phylogenetic endemism, i.e. mean endemism-weighted branch length (equivalent to PE / CE)
 #'
 #' @return A matrix or raster stack with a column or layer (respectively) for each diversity metric.
 #' @export
@@ -34,55 +34,15 @@ sphy_diversity <- function(sp, spatial = T){
                    CE =  apply(sp$occ, 1, function(p) sum(p / R, na.rm = T)),
                    PE =  apply(sp$occ, 1, function(p) sum(p * V / R, na.rm = T)),
                    Em =  apply(sp$occ, 1, function(p) weighted.mean(1 / R, w = p, na.rm = T)),
-                   PDm = apply(sp$occ, 1, function(p) weighted.mean(V, w = p, na.rm = T)),
+                   RPD = apply(sp$occ, 1, function(p) weighted.mean(V, w = p, na.rm = T)),
                    PEm = apply(sp$occ, 1, function(p) weighted.mean(V / R, w = p, na.rm = T)),
-                   BEm = apply(sp$occ, 1, function(p) weighted.mean(V, w = p / R, na.rm = T)) )
+                   RPE = apply(sp$occ, 1, function(p) weighted.mean(V, w = p / R, na.rm = T)) )
 
       if(spatial & !is.null(sp$spatial)) div <- to_raster(div, sp$spatial)
       return(div)
 }
 
 
-#' Randomization tests including CANAPE
-#'
-#' This function is a wrapper around the \code{cpr_rand_test} function from Joel Nitta's \code{canaper} package.
-#'
-#' @param sp spatialphy object
-#' @param null_model see \code{canaper::cpr_rand_test}
-#' @param spatial Boolean: should the function return a spatial object (TRUE, default) or a vector (FALSE).
-#' @param ... further arguments passed to \code{canaper::cpr_rand_test}
-#'
-#' @details This function runs \code{canaper::cpr_rand_test}; see the help for that function for details.
-#'
-#' It also runs \code{canaper::cpr_classify_endem} on the result, and includes the resulting classification as an additional variable, 'endem_type', in the output. 'endem_type' values 0-4 correspond to not-significant, neo, paleo, mixed, and super endemesim, respectively.
-#'
-#' @return A matrix or raster stack with a column or layer (respectively) for each metric.
-#' @export
-sphy_rand <- function(sp, null_model = "swap", spatial = T, ...){
 
-      cpr <- require("canaper")
-      if(!cpr) stop("The sphy_canape() function requires the canaper library, but couldn't find it; please see https://github.com/joelnitta/canaper for info and installation.")
-
-      phy <- sp$tree
-      comm <- sp$occ[, tip_indices(phy)]
-      colnames(comm) <- phy$tip.label
-      rownames(comm) <- paste0("s", 1:nrow(comm))
-      cm <- comm[rowSums(comm) > 0, ]
-
-      r <- as.matrix(canaper::cpr_rand_test(cm, phy, null_model = null_model, ...))
-
-      ro <- matrix(NA, nrow(comm), ncol(r))
-      ro[rowSums(comm) > 0, ] <- r
-      rownames(ro) <- rownames(comm)
-      colnames(ro) <- colnames(r)
-
-      ro <- canaper::cpr_classify_endem(as.data.frame(ro))
-      ro$endem_type <- as.integer(factor(ro$endem_type,
-                                         levels = c("not significant", "neo", "paleo", "mixed", "super"))) - 1
-      ro <- as.matrix(ro)
-
-      if(spatial & !is.null(sp$spatial)) ro <- to_raster(ro, sp$spatial)
-      return(ro)
-}
 
 

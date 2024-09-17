@@ -27,8 +27,8 @@ The function calculates the following metrics:
 \item CE: Clade endemism, i.e. total endemism-weighted diversity of taxa at all levels (equivalent to PE on a cladrogram)
 \item PE: Phylogenetic endemism, i.e. endemism-weighted PD
 \item Em: Mean endemism (equivalent to CE / CR)
-\item PDm: Mean phylogenetic diversity, i.e. branch length of mean resident (a.k.a. "RPD"; equivalent to PD / CR)
+\item RPD: Relative phylogenetic diversity, i.e. branch length of mean resident (equivalent to PD / CR)
 \item PEm: Mean phylogenetic endemism, i.e. branch length / range size of mean resident (equivalent to PE / CR)
-\item BEm: Mean endemism-weighted branch length (a.k.a. "RPE")
+\item RPE: Relative phylogenetic endemism, i.e. mean endemism-weighted branch length (equivalent to PE / CE)
 }
 }
