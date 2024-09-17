@@ -35,11 +35,12 @@ beta_diversity <- function(M, branch_lengths){
 #' Compute a phyologenetic turnover matrix
 #'
 #' @param sp spatialphy object.
-#' @param add should the results be added to the spatialphy object and returned (T) or returned alone (F)?
+#' @param normalize Logical indicating whether occurrence values should be divided by community totals.
+#' @param add Logical indicating whether results should be added to the spatialphy object and returned (TRUE) or returned alone (FALSE)?
 #'
 #' @return A pairwise phylogenetic difference matrix, with values of 1/PhyloSor, either on its own or as an element of \code{sp}.
 #' @export
-sphy_dist <- function(sp, add = T){
+sphy_dist <- function(sp, normalize = TRUE, add = TRUE){
 
       if(!is.null(sp$dist)){
             message("distance already included in dataset; skipping calculation")
@@ -47,7 +48,10 @@ sphy_dist <- function(sp, add = T){
             if(!add) return(sp$dist)
       }
 
-      dist <- 1 / beta_diversity(sp$occ, sp$tree$edge.length / sum(sp$tree$edge.length))
+      occ <- sp$occ
+      if(normalize) occ <- t(apply(occ, 1, function(x) x / sum(x)))
+      occ[!is.finite(occ)] <- 0
+      dist <- 1 / beta_diversity(occ, sp$tree$edge.length / sum(sp$tree$edge.length))
       dist = as.dist(dist)
 
       if(add){
@@ -63,29 +67,35 @@ sphy_dist <- function(sp, add = T){
 #'
 #' @param sp spatialphy object.
 #' @param k Number of spatial clusters to divide the region into (Positive integer).
-#' @param method Clustering method; currently only "hclust" is supported.
+#' @param method Clustering method. Options include "kmeans", and the methods listed under \link[stats]{hclust}.
+#' @param normalize Logical indicating whether occurrence values should be divided by community totals.
 #'
 #' @return A raster or matrix with an integer indicating which of the \code{k} regions each site belongs to.
 #' @export
-sphy_regions <- function(sp, k = 5, method = "hclust"){
+sphy_regions <- function(sp, k = 5, method = "kmeans", normalize = TRUE){
 
-      if(is.null(sp$dist)) sp <- sphy_dist(sp, add = T)
+      # sites with taxa
+      a <- rowSums(sp$occ) > 0
 
-      d <- as.matrix(sp$dist)
-      rownames(d) <- colnames(d) <- paste("cell", 1:ncol(d))
-      a <- !is.na(rowSums(d)) # sites with taxa
-      da <- d[a, a]
-
-      # sites fully segregated by the 2 basal clades have Inf distance;
-      # set distance to value greater than max observed distance
-      da[is.infinite(da)] <- max(da[!is.infinite(da)]) + 1000
-
-
-      if(method == "hclust"){
-            clust <- hclust(as.dist(da))
-            regions <- cutree(clust, k)
+      if(method == "kmeans"){
+            occ <- sp$occ[a,]
+            if(normalize) occ <- t(apply(occ, 1, function(x) x / sum(x)))
+            occ[!is.finite(occ)] <- 0
+            regions <- kmeans(occ, k)$cluster
       }else{
-            stop("kmeans and other methods not yet implemented")
+            if(is.null(sp$dist)) sp <- sphy_dist(sp, normalize, add = T)
+
+            d <- as.matrix(sp$dist)
+            rownames(d) <- colnames(d) <- paste("cell", 1:ncol(d))
+            da <- d[a, a]
+
+            # sites fully segregated by the 2 basal clades have Inf distance;
+            # set distance to value greater than max observed distance
+            da[is.infinite(da)] <- max(da[!is.infinite(da)]) + 1000
+            da <- as.dist(da)
+
+            clust <- hclust(da, method = method)
+            regions <- cutree(clust, k)
       }
 
 
@@ -99,7 +109,6 @@ sphy_regions <- function(sp, k = 5, method = "hclust"){
       }else{
             return(a)
       }
-
 
 }
 

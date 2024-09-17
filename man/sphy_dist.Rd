@@ -4,12 +4,14 @@
 \alias{sphy_dist}
 \title{Compute a phyologenetic turnover matrix}
 \usage{
-sphy_dist(sp, add = T)
+sphy_dist(sp, normalize = TRUE, add = TRUE)
 }
 \arguments{
 \item{sp}{spatialphy object.}
 
-\item{add}{should the results be added to the spatialphy object and returned (T) or returned alone (F)?}
+\item{normalize}{Logical indicating whether occurrence values should be divided by community totals.}
+
+\item{add}{Logical indicating whether results should be added to the spatialphy object and returned (TRUE) or returned alone (FALSE)?}
 }
 \value{
 A pairwise phylogenetic difference matrix, with values of 1/PhyloSor, either on its own or as an element of \code{sp}.

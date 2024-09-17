@@ -4,14 +4,16 @@
 \alias{sphy_regions}
 \title{Phyologenetic regionalization}
 \usage{
-sphy_regions(sp, k = 5, method = "hclust")
+sphy_regions(sp, k = 5, method = "kmeans", normalize = TRUE)
 }
 \arguments{
 \item{sp}{spatialphy object.}
 
 \item{k}{Number of spatial clusters to divide the region into (Positive integer).}
 
-\item{method}{Clustering method; currently only "hclust" is supported.}
+\item{method}{Clustering method. Options include "kmeans", and the methods listed under \link[stats]{hclust}.}
+
+\item{normalize}{Logical indicating whether occurrence values should be divided by community totals.}
 }
 \value{
 A raster or matrix with an integer indicating which of the \code{k} regions each site belongs to.

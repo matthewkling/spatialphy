@@ -11,6 +11,7 @@ strand(
   algorithm = "curveball",
   jitter = 0.99,
   priority = "neither",
+  n_iter = 10000,
   ...
 )
 }

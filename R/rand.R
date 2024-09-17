@@ -25,7 +25,7 @@
 #' @return A randomized version of \code{x}.
 #' @export
 strand <- function(x, n_strata = 5, transform = identity, algorithm = "curveball",
-                   jitter = .99, priority = "neither", ...){
+                   jitter = .99, priority = "neither", n_iter = 10000, ...){
 
       nc <- ncol(x)
       nr <- nrow(x)
