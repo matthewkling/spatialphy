@@ -40,10 +40,20 @@ build_tree_ranges <- function(tree, tip_occs){
 }
 
 
-get_tip_occs <- function(sp){
+#' Occurrence matrix for terminal taxa
+#'
+#' The community matrix contained in a `spatialphy` object includes a column for every terminal and internal branch.
+#' This function returns the sub-matrix that includes only the terminal taxa.
+#'
+#' @param sp Object of class `spatialphy`.
+#'
+#' @return A site-by-taxon matrix with a column for every terminal branch.
+#' @export
+get_tip_occs <- function(sp, spatial = F){
       phy <- sp$tree
       comm <- sp$occ[, tip_indices(phy)]
       colnames(comm) <- phy$tip.label
+      if(spatial) comm <- to_raster(comm, sp$spatial)
       comm
 }
 

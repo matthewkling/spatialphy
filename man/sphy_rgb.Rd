@@ -4,12 +4,12 @@
 \alias{sphy_rgb}
 \title{Color space ordination of spatial phylogentic composition}
 \usage{
-sphy_rgb(sp, ord_method = "nmds")
+sphy_rgb(sp, method = "nmds")
 }
 \arguments{
 \item{sp}{spatialphy object.}
 
-\item{ord_method}{Ordination method, either "cmds" (classical MDS) or "nmds" (nonmetric MDS, which is slower but often preferred)}
+\item{method}{Ordination method, either "cmds" (classical MDS) or "nmds" (nonmetric MDS, which is slower but often preferred)}
 }
 \value{
 A raster or matrix with layers or columns (respectively) containing RGB color values.

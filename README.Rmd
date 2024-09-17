@@ -6,10 +6,10 @@ output: github_document
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "50%"
+      collapse = TRUE,
+      comment = "#>",
+      fig.path = "man/figures/README-",
+      out.width = "50%"
 )
 ```
 
@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 -   phylogenetic regionalization
 -   phylogenetic conservation prioritization
 
-*WARNING:* This package is still in the early stages of development; there may well be bugs, and the API is subject to change. Use of this library in real projects is not recommended until a more stable version is released.
+One feature that differentiates `spatialphy` from some similar packages is that in addition to working with binary presence/absence data, it's also designed to work with continuous quantities such as occurrence probabilities or abunances. These quantities are treated as weights throughout all the analyses in the package, avoiding the need to discard information by thresholding the data.
 
 
 ## Installation
@@ -40,76 +40,81 @@ remotes::install_github("matthewkling/spatialphy")
 
 ## Examples
 
-Spatial phylogenetic analyses require two essential ingredients: data on the geographic distributions of a set of organisms, and a phylogeny representing their evolutionary relationships. All workflows in the spatialphy package will involve creating a dataset of class `'spatialphy'` containing these necessary components. 
+Spatial phylogenetic analyses require two essential ingredients: data on the geographic distributions of a set of organisms, and a phylogeny representing their evolutionary relationships. All workflows in the spatialphy package involve creating a data set of class `'spatialphy'` containing these necessary components. A user would normally define this object with their own data using the `sphy()` function, but we can also simulate a demonstration dataset using `sphy_simulate()`.
 
-A user would normally define this object with their own data using the `sphy()` function, but we can also simulate a demonstration dataset using `sphy_simulate()`, which we'll do here. The dataset is a list containing:
-
-- a phylogeny
-- a matrix of occurrence data for every clade at every level of the tree (this is constructed internally from user-supplied data about the occurrences of the terminal taxa). Note that this can be presence-absence data, or it can be a fractional value indicating occurrence probability, as is often produced by species distribution models.
-- some spatial metadata, in the form of a raster layer
+To get started, let's load the `spatialphy` library and simulate a demo data set. To get a peek at the underlying data, let's plot the geographic ranges of the terminal species:
 
 ```{r init, message=FALSE, warning=FALSE}
 library(spatialphy)
 library(tmap); library(magrittr)
 set.seed(123)
-sp <- sphy_simulate(n_tips = 50)
+sp <- sphy_simulate(n_tips = 20, n_x = 50, n_y = 50)
+tm_shape(get_tip_occs(sp, spatial = TRUE)) + 
+      tm_raster(palette = "inferno", style = "cont", title = "occurrence\nprobability")
 ```
 
 
 #### Alpha diversity
 
-We can then pass this data object to the other functions in the library. The `sphy_diversity()` function calculates a number of alpha diversity measures, including phylogenetic diversity (PD), phylogenetic endemism (PE), and several others. 
+We can pass this our `spatialphy` object to various other functions in the library. The `sphy_diversity()` function calculates a number of alpha diversity measures, including phylogenetic diversity (PD) and phylogenetic endemism (PE), among others. Let's calculate the diversity metrics and make a plot of PD:
 
 ```{r alpha, message=FALSE, warning=FALSE}
 div <- sphy_diversity(sp)
 names(div)
-tm_shape(div$PD) + tm_raster()
+tm_shape(div$PD) + tm_raster(palette = "inferno", style = "cont")
+```
+
+
+We can also use randomization to calculate the significance of these diversity metrics under a null model, using the `sphy_rand()` function. The default null model uses a stratified randomization designed for use with continuous occurrence data. Let's run 100 randomizations and plot the results for PE. This is a quantile value that gives the proportion of randomizations in which observed PE was greater than randomized PE in a given grid cell (if you wanted to identify "statistically significant" grid cells in a one-tailed test with alpha = 0.05, these would be cells with values greater than 0.95).
+
+```{r rand, message=FALSE, warning=FALSE}
+rand <- sphy_rand(sp, n_rand = 100)
+tm_shape(rand$qPE) + tm_raster(palette = "inferno", style = "cont")
 ```
 
 
 #### Beta diversity (turnover)
 
-We can also look at patterns in the phylogenetic similarity among locations. The first step here is to compute the community phylogenetic distance between every pair of sites; we'll use the `sphy_dist()` function to add a pariwise distance matrix as an additional component in our spatialphy dataset.
+We can also look at patterns in the phylogenetic similarity among locations. The first step here is to compute the community phylogenetic distance between every pair of sites, using the `sphy_dist()` function to add a pairwise distance matrix as an additional component in our spatialphy dataset.
 
 ```{r beta, message=FALSE, warning=FALSE}
-sp <- sphy_dist(sp, add = T)
+sp <- sphy_dist(sp, add = TRUE)
 ```
 
-Having done this, we can then assess spatial turnover patterns in a couple ways. We can qualitatively visualize them by converting the distance matrix to a set of colors representing how similar two sites are to each other, using the `sphy_rgb()` function:
+Having done this, we can then assess spatial turnover patterns in a couple ways. We can qualitatively visualize compositional differences by converting the distance matrix to a set of colors representing how similar two sites are to each other, using the `sphy_rgb()` function:
 
 ```{r rgb, message=FALSE, warning=FALSE}
 sp %>%
-      sphy_rgb() %>%
+      sphy_rgb(method = "cmds") %>%
       tm_shape() +
       tm_rgb(max.value = 1) +
       tm_layout(title = "Phylogenetic ordination")
 ```
 
-We can also perform a more formal cluster analysis that splits the landscape into a set of evolutionary bioregions, using the `sphy_regions()` function. We'll ask for eight regions:
+We can also perform a more formal cluster analysis that splits the landscape into a set of evolutionary bioregions, using the `sphy_regions()` function. Let's ask for eight regions using the "kmeans" clustering method:
 
 ```{r regions, message=FALSE, warning=FALSE}
 sp %>%
-      sphy_regions(k = 8) %>%
+      sphy_regions(k = 8, method = "kmeans") %>%
       tm_shape() +
-      tm_raster(palette = "cat") +
-      tm_layout(legend.outside = T,
-                title = "Phylogenetic regions")
+      tm_raster(style = "cat", palette = "Dark2",
+                title = "phylogenetic region") +
+      tm_layout(legend.outside = T)
 ```
 
 
 #### Conservation prioritization
 
-Finally, this package can also perform a basic spatial conservation prioritization, identifying priority locations for the creation of new protected areas in order to maximize biodiversity protection. This is done using the `sphy_prioritize()` function, which uses a greedy forward stepwise algorithm to produce a nested ranking of conservation priorities.
+Finally, this package can perform a basic spatial conservation prioritization, identifying priority locations for the creation of new protected areas in order to maximize biodiversity protection. This is done using the `sphy_prioritize()` function, which uses a greedy forward stepwise algorithm to produce a nested ranking of conservation priorities.
 
-In addition to our spatial phylogenetic dataset, there is the option to supply a raster layer indicating the locations and effectiveness of existing protected areas. We could also modify parameters that specify the effective level of protection provided by new reserves, as well as the shape of the "benefit" function that determines the relative importance of protecting the initial populations of every taxon versus more populations of more phylogenetically distinct taxa. But here we'll stick with the defaults. In the map below, the highest-priority sites are in yellow.
+In addition to the required spatial phylogenetic dataset, there is the option to supply a raster layer indicating the locations and effectiveness of existing protected areas. We could also modify parameters that specify the effective level of protection provided by new reserves, as well as the shape of the "benefit" function that determines the relative importance of protecting the initial populations of every taxon versus more populations of more phylogenetically distinct taxa. But for this example let's stick with the defaults. In the map below, the highest-priority sites are shown in yellow.
 
 ```{r priorities, message=FALSE, warning=FALSE}
 sp %>%
       sphy_prioritize() %>%
       tm_shape() + 
-      tm_raster(palette = c("yellow", "red", "blue", "black"),
-                colorNA = "gray80", n = 20,
-                title = "conservation priorities") + 
+      tm_raster(palette = "-inferno", style = "log10",
+                title = "conservation\npriorities") + 
       tm_layout(legend.outside = T)
 ```
 

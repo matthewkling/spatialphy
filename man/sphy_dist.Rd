@@ -4,12 +4,15 @@
 \alias{sphy_dist}
 \title{Compute a phyologenetic turnover matrix}
 \usage{
-sphy_dist(sp, normalize = TRUE, add = TRUE)
+sphy_dist(sp, endemism = FALSE, normalize = TRUE, add = TRUE)
 }
 \arguments{
 \item{sp}{spatialphy object.}
 
-\item{normalize}{Logical indicating whether occurrence values should be divided by community totals.}
+\item{endemism}{Logical indicating whether occurrence values should be divided by column (species) totals.}
+
+\item{normalize}{Logical indicating whether occurrence values should be divided by row (community) totals.
+If so, this happens after endemism division.}
 
 \item{add}{Logical indicating whether results should be added to the spatialphy object and returned (TRUE) or returned alone (FALSE)?}
 }

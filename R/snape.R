@@ -19,7 +19,7 @@
 #' statistical significance thresholds, both steps that
 #' @export
 snape <- function(rand,
-                  palette = c("white", "blue", "red"),
+                  palette = c("gray90", "blue", "red"),
                   transform = function(x) x^2){
 
       if(inherits(rand, "RasterBrick")) rand <- values(rand)

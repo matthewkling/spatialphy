@@ -4,7 +4,7 @@
 \alias{sphy_regions}
 \title{Phyologenetic regionalization}
 \usage{
-sphy_regions(sp, k = 5, method = "kmeans", normalize = TRUE)
+sphy_regions(sp, k = 5, method = "kmeans", endemism = FALSE, normalize = TRUE)
 }
 \arguments{
 \item{sp}{spatialphy object.}
@@ -13,7 +13,10 @@ sphy_regions(sp, k = 5, method = "kmeans", normalize = TRUE)
 
 \item{method}{Clustering method. Options include "kmeans", and the methods listed under \link[stats]{hclust}.}
 
-\item{normalize}{Logical indicating whether occurrence values should be divided by community totals.}
+\item{endemism}{Logical indicating whether occurrence values should be divided by column (species) totals.}
+
+\item{normalize}{Logical indicating whether occurrence values should be divided by row (community) totals.
+If so, this happens after endemism division.}
 }
 \value{
 A raster or matrix with an integer indicating which of the \code{k} regions each site belongs to.

@@ -3,6 +3,7 @@
 export(benefit)
 export(beta_diversity)
 export(build_tree_ranges)
+export(get_tip_occs)
 export(snape)
 export(sphy)
 export(sphy_canape)

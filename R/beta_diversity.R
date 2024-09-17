@@ -35,12 +35,14 @@ beta_diversity <- function(M, branch_lengths){
 #' Compute a phyologenetic turnover matrix
 #'
 #' @param sp spatialphy object.
-#' @param normalize Logical indicating whether occurrence values should be divided by community totals.
+#' @param endemism Logical indicating whether occurrence values should be divided by column (species) totals.
+#' @param normalize Logical indicating whether occurrence values should be divided by row (community) totals.
+#'    If so, this happens after endemism division.
 #' @param add Logical indicating whether results should be added to the spatialphy object and returned (TRUE) or returned alone (FALSE)?
 #'
 #' @return A pairwise phylogenetic difference matrix, with values of 1/PhyloSor, either on its own or as an element of \code{sp}.
 #' @export
-sphy_dist <- function(sp, normalize = TRUE, add = TRUE){
+sphy_dist <- function(sp, endemism = FALSE, normalize = TRUE, add = TRUE){
 
       if(!is.null(sp$dist)){
             message("distance already included in dataset; skipping calculation")
@@ -49,6 +51,7 @@ sphy_dist <- function(sp, normalize = TRUE, add = TRUE){
       }
 
       occ <- sp$occ
+      if(endemism) occ <- apply(occ, 2, function(x) x / sum(x))
       if(normalize) occ <- t(apply(occ, 1, function(x) x / sum(x)))
       occ[!is.finite(occ)] <- 0
       dist <- 1 / beta_diversity(occ, sp$tree$edge.length / sum(sp$tree$edge.length))
@@ -68,22 +71,25 @@ sphy_dist <- function(sp, normalize = TRUE, add = TRUE){
 #' @param sp spatialphy object.
 #' @param k Number of spatial clusters to divide the region into (Positive integer).
 #' @param method Clustering method. Options include "kmeans", and the methods listed under \link[stats]{hclust}.
-#' @param normalize Logical indicating whether occurrence values should be divided by community totals.
+#' @param endemism Logical indicating whether occurrence values should be divided by column (species) totals.
+#' @param normalize Logical indicating whether occurrence values should be divided by row (community) totals.
+#'    If so, this happens after endemism division.
 #'
 #' @return A raster or matrix with an integer indicating which of the \code{k} regions each site belongs to.
 #' @export
-sphy_regions <- function(sp, k = 5, method = "kmeans", normalize = TRUE){
+sphy_regions <- function(sp, k = 5, method = "kmeans", endemism = FALSE, normalize = TRUE){
 
       # sites with taxa
       a <- rowSums(sp$occ) > 0
 
       if(method == "kmeans"){
             occ <- sp$occ[a,]
+            if(endemism) occ <- apply(occ, 2, function(x) x / sum(x))
             if(normalize) occ <- t(apply(occ, 1, function(x) x / sum(x)))
             occ[!is.finite(occ)] <- 0
             regions <- kmeans(occ, k)$cluster
       }else{
-            if(is.null(sp$dist)) sp <- sphy_dist(sp, normalize, add = T)
+            if(is.null(sp$dist)) sp <- sphy_dist(sp, endemism, normalize, add = T)
 
             d <- as.matrix(sp$dist)
             rownames(d) <- colnames(d) <- paste("cell", 1:ncol(d))
@@ -117,11 +123,11 @@ sphy_regions <- function(sp, k = 5, method = "kmeans", normalize = TRUE){
 #' Color space ordination of spatial phylogentic composition
 #'
 #' @param sp spatialphy object.
-#' @param ord_method Ordination method, either "cmds" (classical MDS) or "nmds" (nonmetric MDS, which is slower but often preferred)
+#' @param method Ordination method, either "cmds" (classical MDS) or "nmds" (nonmetric MDS, which is slower but often preferred)
 #'
 #' @return A raster or matrix with layers or columns (respectively) containing RGB color values.
 #' @export
-sphy_rgb <- function(sp, ord_method = "nmds"){
+sphy_rgb <- function(sp, method = "nmds"){
 
       d <- as.matrix(sp$dist)
       rownames(d) <- colnames(d) <- paste("cell", 1:ncol(d))
@@ -132,11 +138,11 @@ sphy_rgb <- function(sp, ord_method = "nmds"){
       # set distance to value greater than max observed distance
       da[is.infinite(da)] <- max(da[!is.infinite(da)]) + 1000
 
-      if(ord_method == "cmds"){
+      if(method == "cmds"){
             ord <- cmdscale(da, k = 3)
             rgb <- apply(ord, 2, function(x) (x - min(x)) / (max(x) - min(x)))
       }
-      if(ord_method == "nmds"){
+      if(method == "nmds"){
             ord <- vegan::metaMDS(da, k = 3, trace = 0)
             rgb <- apply(ord$points, 2, function(x) (x - min(x)) / (max(x) - min(x)))
       }
