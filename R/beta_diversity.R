@@ -120,7 +120,7 @@ sphy_regions <- function(sp, k = 5, method = "kmeans", endemism = FALSE, normali
 
 
 
-#' Color space ordination of spatial phylogentic composition
+#' Color space ordination of spatial phylogenetic composition
 #'
 #' @param sp spatialphy object.
 #' @param method Ordination method, either "pca" (principal component analysis), "cmds" (classical MDS),
@@ -128,7 +128,7 @@ sphy_regions <- function(sp, k = 5, method = "kmeans", endemism = FALSE, normali
 #' @param trans A function giving the transformation to apply to each dimension of the ordinated data.
 #'    The default is the identity funciton. Specifying \code{rank} generates a more uniform color distribution.
 #'
-#' @return A raster or matrix with layers or columns (respectively) containing RGB color values.
+#' @return A raster or matrix with layers or columns (respectively) containing RGB color values in the range 0-1.
 #' @export
 sphy_rgb <- function(sp, method = "nmds", trans = identity){
 
@@ -144,7 +144,7 @@ sphy_rgb <- function(sp, method = "nmds", trans = identity){
       # ordinate
       if(method == "cmds") ord <- cmdscale(da, k = 3)
       if(method == "nmds") ord <- vegan::metaMDS(da, k = 3, trace = 0)$points
-      if(method == "pca") ord <- prcomp(sp$occ, scale. = T)$x[,1:3]
+      if(method == "pca") ord <- prcomp(sp$occ[a,], scale. = T)$x[,1:3]
 
       # scale
       rgb <- apply(ord, 2, function(x){
