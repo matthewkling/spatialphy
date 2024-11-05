@@ -123,11 +123,14 @@ sphy_regions <- function(sp, k = 5, method = "kmeans", endemism = FALSE, normali
 #' Color space ordination of spatial phylogentic composition
 #'
 #' @param sp spatialphy object.
-#' @param method Ordination method, either "cmds" (classical MDS) or "nmds" (nonmetric MDS, which is slower but often preferred)
+#' @param method Ordination method, either "pca" (principal component analysis), "cmds" (classical MDS),
+#'    or "nmds" (nonmetric MDS, the default, which is slower but often preferred).
+#' @param trans A function giving the transformation to apply to each dimension of the ordinated data.
+#'    The default is the identity funciton. Specifying \code{rank} generates a more uniform color distribution.
 #'
 #' @return A raster or matrix with layers or columns (respectively) containing RGB color values.
 #' @export
-sphy_rgb <- function(sp, method = "nmds"){
+sphy_rgb <- function(sp, method = "nmds", trans = identity){
 
       d <- as.matrix(sp$dist)
       rownames(d) <- colnames(d) <- paste("cell", 1:ncol(d))
@@ -138,23 +141,27 @@ sphy_rgb <- function(sp, method = "nmds"){
       # set distance to value greater than max observed distance
       da[is.infinite(da)] <- max(da[!is.infinite(da)]) + 1000
 
-      if(method == "cmds"){
-            ord <- cmdscale(da, k = 3)
-            rgb <- apply(ord, 2, function(x) (x - min(x)) / (max(x) - min(x)))
-      }
-      if(method == "nmds"){
-            ord <- vegan::metaMDS(da, k = 3, trace = 0)
-            rgb <- apply(ord$points, 2, function(x) (x - min(x)) / (max(x) - min(x)))
-      }
+      # ordinate
+      if(method == "cmds") ord <- cmdscale(da, k = 3)
+      if(method == "nmds") ord <- vegan::metaMDS(da, k = 3, trace = 0)$points
+      if(method == "pca") ord <- prcomp(sp$occ, scale. = T)$x[,1:3]
 
+      # scale
+      rgb <- apply(ord, 2, function(x){
+            x <- trans(x)
+            (x - min(x)) / (max(x) - min(x))
+      })
+
+      # reinsert NA values
       b <- cbind(a, a, a)
       b[a,] <- rgb
       b[!a,] <- NA
 
       if(!is.null(sp$spatial)){
-            r <- setNames(stack(sp$spatial, sp$spatial, sp$spatial),
-                          c("r", "g", "b"))
+            # convert to raster
+            r <- stack(sp$spatial, sp$spatial, sp$spatial)
             r[] <- b
+            r <- setNames(r, c("r", "g", "b"))
             return(r)
       }else{
             return(b)
