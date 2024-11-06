@@ -37,7 +37,7 @@ strand <- function(x, n_strata = 5, transform = identity, algorithm = "curveball
       if(jitter > 0){
             offset <- seq(-jitter, jitter, length.out = 1000)
             offset <- sample(offset, 1, prob = jitter - abs(offset))
-            breaks <- breaks + offset
+            breaks <- breaks + offset * bw
       }
       s[] <- as.integer(cut(s, breaks))
       b <- apply(s, 1:2, function(x) replace(rep(0, n_strata), x, 1))
